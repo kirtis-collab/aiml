@@ -1,194 +1,89 @@
-# Practical 8: Clustering Techniques
-# K-Means and Hierarchical Clustering
 
 import pandas as pd
 import matplotlib.pyplot as plt
-
-from sklearn.cluster import KMeans
-from sklearn.cluster import AgglomerativeClustering
+from sklearn.cluster import KMeans, AgglomerativeClustering
 from scipy.cluster.hierarchy import dendrogram, linkage
 
-# ------------------------------------------------
 # 1. Load Dataset
-# ------------------------------------------------
-
 data = pd.read_csv("D:/aiml/Mall_Customers.csv")
 
 print("First 5 records:")
 print(data.head())
 
-# ------------------------------------------------
 # 2. Select Features
-# ------------------------------------------------
-
 X = data[['Annual Income (k$)', 'Spending Score (1-100)']]
+print("\nSelected Features:\n", X.head())
 
-print("\nSelected Features:")
-print(X.head())
-
-# ------------------------------------------------
 # 3. Elbow Method
-# ------------------------------------------------
-
 wcss = []
 
 for k in range(1, 11):
-
-    kmeans = KMeans(
-        n_clusters=k,
-        random_state=42,
-        n_init=10
-    )
-
-    kmeans.fit(X)
-
-    wcss.append(kmeans.inertia_)
-
-# Plot Elbow Curve
+    model = KMeans(n_clusters=k, random_state=42, n_init=10)
+    model.fit(X)
+    wcss.append(model.inertia_)
 
 plt.figure(figsize=(8, 5))
-
-plt.plot(
-    range(1, 11),
-    wcss,
-    marker='o'
-)
-
+plt.plot(range(1, 11), wcss, marker='o')
 plt.xlabel("Number of Clusters (K)")
 plt.ylabel("WCSS")
 plt.title("Elbow Method")
-
 plt.show()
 
-# ------------------------------------------------
 # 4. K-Means Clustering
-# ------------------------------------------------
-
-# Assume optimal K = 5 from Elbow Method
-
-kmeans = KMeans(
-    n_clusters=5,
-    random_state=42,
-    n_init=10
-)
-
+kmeans = KMeans(n_clusters=5, random_state=42, n_init=10)
 data['KMeans_Cluster'] = kmeans.fit_predict(X)
 
 print("\nK-Means Cluster Results:")
-print(
-    data[
-        ['CustomerID',
-         'Annual Income (k$)',
-         'Spending Score (1-100)',
-         'KMeans_Cluster']
-    ].head(20)
-)
+print(data[['CustomerID', 'Annual Income (k$)',
+            'Spending Score (1-100)', 'KMeans_Cluster']].head(20))
 
-# ------------------------------------------------
-# 5. Visualize K-Means Clusters
-# ------------------------------------------------
-
+# 5. K-Means Visualization
 plt.figure(figsize=(8, 6))
-
-plt.scatter(
-    X.iloc[:, 0],
-    X.iloc[:, 1],
-    c=data['KMeans_Cluster'],
-    s=50
-)
-
-# Plot centroids
+plt.scatter(X.iloc[:, 0], X.iloc[:, 1],
+            c=data['KMeans_Cluster'], s=50)
 
 centers = kmeans.cluster_centers_
-
-plt.scatter(
-    centers[:, 0],
-    centers[:, 1],
-    marker='X',
-    s=200,
-    label='Centroids'
-)
+plt.scatter(centers[:, 0], centers[:, 1],
+            marker='X', s=200, label='Centroids')
 
 plt.xlabel("Annual Income (k$)")
 plt.ylabel("Spending Score (1-100)")
-
 plt.title("K-Means Clustering")
-
 plt.legend()
-
 plt.show()
 
-# ------------------------------------------------
-# 6. Hierarchical Clustering - Dendrogram
-# ------------------------------------------------
-
-linked = linkage(
-    X,
-    method='ward'
-)
+# 6. Hierarchical Clustering Dendrogram
+linked = linkage(X, method='ward')
 
 plt.figure(figsize=(12, 6))
-
 dendrogram(linked)
-
 plt.title("Hierarchical Clustering Dendrogram")
-
 plt.xlabel("Customers")
-
 plt.ylabel("Euclidean Distance")
-
 plt.show()
 
-# ------------------------------------------------
-# 7. Agglomerative Hierarchical Clustering
-# ------------------------------------------------
-
-hierarchical = AgglomerativeClustering(
-    n_clusters=5,
-    linkage='ward'
-)
-
+# 7. Agglomerative Clustering
+hierarchical = AgglomerativeClustering(n_clusters=5, linkage='ward')
 data['Hierarchical_Cluster'] = hierarchical.fit_predict(X)
 
 print("\nHierarchical Clustering Results:")
+print(data[['CustomerID', 'Annual Income (k$)',
+            'Spending Score (1-100)',
+            'Hierarchical_Cluster']].head(20))
 
-print(
-    data[
-        ['CustomerID',
-         'Annual Income (k$)',
-         'Spending Score (1-100)',
-         'Hierarchical_Cluster']
-    ].head(20)
-)
-
-# ------------------------------------------------
-# 8. Visualize Hierarchical Clusters
-# ------------------------------------------------
-
+# 8. Hierarchical Clustering Visualization
 plt.figure(figsize=(8, 6))
-
-plt.scatter(
-    X.iloc[:, 0],
-    X.iloc[:, 1],
-    c=data['Hierarchical_Cluster'],
-    s=50
-)
+plt.scatter(X.iloc[:, 0], X.iloc[:, 1],
+            c=data['Hierarchical_Cluster'], s=50)
 
 plt.xlabel("Annual Income (k$)")
 plt.ylabel("Spending Score (1-100)")
-
 plt.title("Hierarchical Clustering")
-
 plt.show()
 
-# ------------------------------------------------
-# 9. Display Cluster Counts
-# ------------------------------------------------
-
+# 9. Cluster Counts
 print("\nK-Means Cluster Counts:")
-
 print(data['KMeans_Cluster'].value_counts())
 
 print("\nHierarchical Cluster Counts:")
-
 print(data['Hierarchical_Cluster'].value_counts())
