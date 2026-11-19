@@ -71,3 +71,110 @@ for i in range(n):
     # Show internal model (history)
     print(f"Internal Model (Last 3 Temps): {agent.history}")
     print()
+
+
+
+
+##recommendation##
+print("*"*80)
+print("                    welcome to recommendation assistant           ")
+print("*"*80)
+
+print("\nselect your interest")
+print("1.movie")
+print("2.book")
+print("3.music")
+
+choice=input("\nenter your choice(1/2/3): ")
+
+if choice=="1":
+    print("\nchoose movie genre: ")
+    print("a.action")
+    print("b.comedy")
+    print("c.drama")
+    
+    genre=input("enter genre(a/b/c): ")
+    
+    if genre=="a":
+        print("\nrecommended movie : RRR")
+    elif genre=="b":
+        print("\nrecommended movie : Hera Pheri")
+    elif genre=="c":
+        print("\nrecommended movie : Tare Zameen Par")
+    else:
+       print("\ninvalid choice")
+       
+elif choice=="2":
+    print("\nchoose book category: ")
+    print("a.mythology")
+    print("b.fiction")
+    print("c.motivation")
+    
+    category=input("\nenter category(a/b/c): ")
+    
+    if category=="a":
+        print("recommended book : The Palace of Illusion")
+    elif category=="b":
+        print("recommended book : The Guide")
+    elif category=="c":
+        print("Wings of Fire")
+    else:
+        print("invalid category")
+        
+        
+elif choice=="3":
+    print("\nchoose music type")
+    print("a.motivational")
+    print("b.devotional")
+    print("c.party")
+    
+    music = input("enter type (a/b/c) : ")
+    
+    if music=="a":
+        print("recommended song: Chak De India")
+    elif music=="b":
+        print("recommended song : Achyutam Keshavam")
+    elif music=="c":
+        print("recommended song : kala Chashma")
+    else:
+        print("invalic choice")
+        
+else:
+    print("invalid choice")
+    
+print("\nthank you for using recommendation assistant")
+
+
+
+
+##chatbot##
+def chatbot():
+
+    print("Chatbot Started")
+    print("Type 'bye' to exit")
+
+    while True:
+
+        user = input("You: ").lower()
+
+        if user == "hello":
+            print("Bot: Hello! How can I help you?")
+
+        elif user == "how are you":
+            print("Bot: I am fine.")
+
+        elif user == "your name":
+            print("Bot: I am an AI Chatbot.")
+
+        elif user == "bye":
+            print("Bot: Goodbye!")
+            break
+
+        else:
+            print("Bot: Sorry, I don't understand.")
+
+chatbot()
+
+    
+        
+
