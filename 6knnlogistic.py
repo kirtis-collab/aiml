@@ -1,214 +1,91 @@
-# ============================================================
-# EXPERIMENT 7
-# Classification using Logistic Regression and KNN
-# ============================================================
 
-# Step 1: Import required libraries
 import pandas as pd
 import matplotlib.pyplot as plt
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
-
 from sklearn.linear_model import LogisticRegression
 from sklearn.neighbors import KNeighborsClassifier
-
 from sklearn.metrics import (
-    accuracy_score,
-    precision_score,
-    recall_score,
-    f1_score,
-    confusion_matrix,
-    ConfusionMatrixDisplay
+    accuracy_score, precision_score, recall_score,
+    f1_score, confusion_matrix, ConfusionMatrixDisplay
 )
 
-
-# ------------------------------------------------------------
-# Step 2: Load the dataset
-# ------------------------------------------------------------
-
+# 1. Load Dataset
 df = pd.read_csv("heart.csv")
 
 print("First 5 records:")
 print(df.head())
-
-print("\nDataset Shape:")
-print(df.shape)
-
-
-# ------------------------------------------------------------
-# Step 3: Check missing values
-# ------------------------------------------------------------
-
+print("\nDataset Shape:", df.shape)
 print("\nMissing Values:")
 print(df.isnull().sum())
 
-
-# ------------------------------------------------------------
-# Step 4: Separate features and target
-# ------------------------------------------------------------
-
+# 2. Separate Features and Target
 X = df.drop("target", axis=1)
 y = df["target"]
 
 print("\nFeatures:")
 print(X.head())
-
 print("\nTarget:")
 print(y.head())
 
-
-# ------------------------------------------------------------
-# Step 5: Split data into training and testing
-# ------------------------------------------------------------
-
+# 3. Split Dataset
 X_train, X_test, y_train, y_test = train_test_split(
-    X,
-    y,
-    test_size=0.20,
-    random_state=42,
-    stratify=y
+    X, y, test_size=0.20, random_state=42, stratify=y
 )
 
 print("\nTraining data:", X_train.shape)
 print("Testing data :", X_test.shape)
 
-
-# ------------------------------------------------------------
-# Step 6: Feature Scaling
-# ------------------------------------------------------------
-
+# 4. Feature Scaling
 scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 
-X_train_scaled = scaler.fit_transform(X_train)
-X_test_scaled = scaler.transform(X_test)
+# 5. Create Models
+models = {
+    "Logistic Regression": LogisticRegression(max_iter=1000),
+    "KNN": KNeighborsClassifier(n_neighbors=5)
+}
 
+results = {}
 
-# ============================================================
-# MODEL 1: LOGISTIC REGRESSION
-# ============================================================
+# 6. Train and Evaluate Models
+for name, model in models.items():
+    print("\n==============================")
+    print(name.upper())
+    print("==============================")
 
-print("\n==============================")
-print("LOGISTIC REGRESSION")
-print("==============================")
+    model.fit(X_train, y_train)
+    pred = model.predict(X_test)
 
+    acc = accuracy_score(y_test, pred)
+    pre = precision_score(y_test, pred)
+    rec = recall_score(y_test, pred)
+    f1 = f1_score(y_test, pred)
 
-# Create model
-lr_model = LogisticRegression(max_iter=1000)
+    results[name] = [acc, pre, rec, f1]
 
-# Train model
-lr_model.fit(X_train_scaled, y_train)
+    print("Accuracy :", acc)
+    print("Precision:", pre)
+    print("Recall   :", rec)
+    print("F1 Score :", f1)
 
-# Prediction
-y_pred_lr = lr_model.predict(X_test_scaled)
+    print("\nConfusion Matrix:")
+    print(confusion_matrix(y_test, pred))
 
+    ConfusionMatrixDisplay.from_predictions(y_test, pred)
+    plt.title(name + " - Confusion Matrix")
+    plt.show()
 
-# ------------------------------------------------------------
-# Evaluation of Logistic Regression
-# ------------------------------------------------------------
-
-lr_accuracy = accuracy_score(y_test, y_pred_lr)
-lr_precision = precision_score(y_test, y_pred_lr)
-lr_recall = recall_score(y_test, y_pred_lr)
-lr_f1 = f1_score(y_test, y_pred_lr)
-
-print("Accuracy :", lr_accuracy)
-print("Precision:", lr_precision)
-print("Recall   :", lr_recall)
-print("F1 Score :", lr_f1)
-
-print("\nConfusion Matrix:")
-cm_lr = confusion_matrix(y_test, y_pred_lr)
-print(cm_lr)
-
-
-# Display confusion matrix
-ConfusionMatrixDisplay.from_predictions(
-    y_test,
-    y_pred_lr
-)
-
-plt.title("Logistic Regression - Confusion Matrix")
-plt.show()
-
-
-# ============================================================
-# MODEL 2: K-NEAREST NEIGHBORS
-# ============================================================
-
-print("\n==============================")
-print("K-NEAREST NEIGHBORS (KNN)")
-print("==============================")
-
-
-# Create KNN model
-knn_model = KNeighborsClassifier(n_neighbors=5)
-
-# Train model
-knn_model.fit(X_train_scaled, y_train)
-
-# Prediction
-y_pred_knn = knn_model.predict(X_test_scaled)
-
-
-# ------------------------------------------------------------
-# Evaluation of KNN
-# ------------------------------------------------------------
-
-knn_accuracy = accuracy_score(y_test, y_pred_knn)
-knn_precision = precision_score(y_test, y_pred_knn)
-knn_recall = recall_score(y_test, y_pred_knn)
-knn_f1 = f1_score(y_test, y_pred_knn)
-
-print("Accuracy :", knn_accuracy)
-print("Precision:", knn_precision)
-print("Recall   :", knn_recall)
-print("F1 Score :", knn_f1)
-
-print("\nConfusion Matrix:")
-cm_knn = confusion_matrix(y_test, y_pred_knn)
-print(cm_knn)
-
-
-# Display confusion matrix
-ConfusionMatrixDisplay.from_predictions(
-    y_test,
-    y_pred_knn
-)
-
-plt.title("KNN - Confusion Matrix")
-plt.show()
-
-
-# ============================================================
-# COMPARISON OF BOTH MODELS
-# ============================================================
+# 7. Comparison of Both Models
+comparison = pd.DataFrame({
+    "Metric": ["Accuracy", "Precision", "Recall", "F1 Score"],
+    "Logistic Regression": results["Logistic Regression"],
+    "KNN": results["KNN"]
+})
 
 print("\n======================================")
 print("COMPARISON OF BOTH MODELS")
 print("======================================")
-
-comparison = pd.DataFrame({
-    "Metric": [
-        "Accuracy",
-        "Precision",
-        "Recall",
-        "F1 Score"
-    ],
-
-    "Logistic Regression": [
-        lr_accuracy,
-        lr_precision,
-        lr_recall,
-        lr_f1
-    ],
-
-    "KNN": [
-        knn_accuracy,
-        knn_precision,
-        knn_recall,
-        knn_f1
-    ]
-})
-
 print(comparison)
